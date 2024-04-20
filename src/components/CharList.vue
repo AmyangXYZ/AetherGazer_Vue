@@ -8,9 +8,7 @@
 
 <script setup lang="ts">
 import { SelectedChar } from '@/hooks/useStates'
-import { User, Search } from '@element-plus/icons-vue'
-
-const charList = ['Thoth', 'Hades', 'Gengchen']
+const charList = ['Thoth', 'Thoth2', 'Bastet', 'Hades', 'Gengchen', 'Yingzhao']
 </script>
 
 <style scoped>
