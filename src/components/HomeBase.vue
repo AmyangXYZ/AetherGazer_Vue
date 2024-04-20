@@ -2,7 +2,9 @@
   <CharModel ref="char" style="left: 12%" @click="toggleButtonGroup" />
   <div v-if="buttonGroupVisible" class="button-group" :style="buttonGroupStyle">
     <el-tooltip effect="light" content="Switch char" :hide-after="0" placement="bottom-start">
-      <el-button :icon="Switch" size="large" circle @click="handleButtonClick('Button 1')" />
+      <RouterLink to="/chars">
+        <el-button :icon="Switch" size="large" circle @click="handleButtonClick('Button 1')" />
+      </RouterLink>
     </el-tooltip>
   </div>
 </template>
@@ -45,8 +47,7 @@ const handleButtonClick = (buttonName: string) => {
   width: 100%;
   height: 100%;
   position: absolute;
-  z-index: 1;
-  /* background-color: #aaa; */
+  z-index: 1000;
 }
 .button-group {
   position: absolute;

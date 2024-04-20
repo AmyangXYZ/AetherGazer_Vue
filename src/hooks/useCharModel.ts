@@ -7,6 +7,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
 import { BrightnessContrastShader } from 'three/examples/jsm/shaders/BrightnessContrastShader'
 import Stats from 'three/addons/libs/stats.module.js'
+import { LoadedModels } from './useStates'
 
 export function useCharModel(container: HTMLElement) {
   const scene = new THREE.Scene()
@@ -67,17 +68,24 @@ export function useCharModel(container: HTMLElement) {
   }
 
   let model: THREE.Object3D | undefined = undefined
+  const loader = new MMDLoader()
   const Load = (char: string) => {
     if (model != undefined) {
       scene.remove(model)
     }
-    const loader = new MMDLoader()
-    loader.load(`/chars/${char}/${char}.pmx`, (m: any) => {
-      m.position.y = -12
-      model = m
+
+    if (LoadedModels[char] == undefined) {
+      loader.load(`/chars/${char}/${char}.pmx`, (m: any) => {
+        m.position.y = -12
+        model = m
+        LoadedModels[char] = model
+        scene.add(model!)
+      })
+    } else {
+      model = LoadedModels[char]
       scene.add(model!)
-    })
-    animate()
+    }
   }
+  animate()
   return { Load }
 }
