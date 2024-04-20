@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import { SelectedChar } from '@/hooks/useStates'
-const charList = ['Thoth', 'Thoth2', 'Bastet', 'Hades', 'Gengchen', 'Yingzhao']
+const charList = ['Thoth', 'Thoth2', 'Bastet', 'Hera', 'Hades', 'Gengchen', 'Yingzhao']
 </script>
 
 <style scoped>
