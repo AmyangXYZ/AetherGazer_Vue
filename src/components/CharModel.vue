@@ -3,21 +3,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useCharModel } from '@/hooks/useCharModel'
+import { SelectedChar } from '@/hooks/useStates'
+
 const container = ref()
+
 onMounted(() => {
-  useCharModel(container.value)
+  const { Load } = useCharModel(container.value)
+  Load(SelectedChar.value)
+
+  watch(SelectedChar, () => {
+    Load(SelectedChar.value)
+  })
 })
 </script>
 
 <style scoped>
 .char {
   position: absolute;
-  top: 10%;
-  left: 10%;
-  width: 600px;
+  top: 5%;
+  width: 700px;
+  height: 90vh;
   z-index: 999;
-  height: 800px;
 }
 </style>

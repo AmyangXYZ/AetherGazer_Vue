@@ -1,1 +1,5 @@
 declare module 'three/examples/jsm/loaders/MMDLoader'
+declare module 'three/examples/jsm/postprocessing/EffectComposer'
+declare module 'three/examples/jsm/postprocessing/RenderPass'
+declare module 'three/examples/jsm/postprocessing/ShaderPass'
+declare module 'three/examples/jsm/shaders/BrightnessContrastShader'

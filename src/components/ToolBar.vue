@@ -1,15 +1,15 @@
 <template>
-  <el-card class="status">Status </el-card>
+  <el-card class="toolbar">Tools </el-card>
 </template>
 
 <script setup lang="ts"></script>
 
 <style scoped>
-.status {
+.toolbar {
   position: absolute;
-  bottom: 16px;
+  top: 72px;
   right: 16px;
-  width: 150px;
+  width: 80px;
   z-index: 999;
 }
 </style>

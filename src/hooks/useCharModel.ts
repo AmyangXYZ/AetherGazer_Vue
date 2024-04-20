@@ -17,35 +17,24 @@ export function useCharModel(container: HTMLElement) {
   container.appendChild(renderer.domElement)
   renderer.outputColorSpace = THREE.SRGBColorSpace
 
-  THREE.ColorManagement.enabled = true
-  const gridHelper = new THREE.PolarGridHelper(20, 0)
-  gridHelper.position.y = -12
-  scene.add(gridHelper)
-
   const camera = new THREE.PerspectiveCamera(
     50,
     container.clientWidth / container.clientHeight,
     0.1,
-    1000
+    100
   )
-  camera.position.set(0, 8, 22)
+  camera.position.set(0, 8, 20)
   camera.lookAt(new THREE.Vector3(0, 0, 0))
   THREE.ColorManagement.enabled = true
-  const ambient = new THREE.AmbientLight(0xffffff, 1.5)
+  const ambient = new THREE.AmbientLight(0xffffff, 1.6)
   scene.add(ambient)
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5)
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 1.6)
   directionalLight.position.set(1, 1, 1).normalize()
   scene.add(directionalLight)
 
   const controls = new OrbitControls(camera, renderer.domElement)
   controls.minDistance = 1
-  controls.maxDistance = 1000
-
-  const loader = new MMDLoader()
-  loader.load('/chars/tt.pmx', (model: any) => {
-    model.position.y = -12
-    scene.add(model)
-  })
+  controls.maxDistance = 200
 
   const resizeHandler = () => {
     camera.aspect = container.clientWidth / container.clientHeight
@@ -60,14 +49,14 @@ export function useCharModel(container: HTMLElement) {
 
   const brightnessContrastPass = new ShaderPass(BrightnessContrastShader)
   brightnessContrastPass.uniforms.brightness.value = 0 // Adjust brightness
-  brightnessContrastPass.uniforms.contrast.value = 0.05 // Adjust contrast
+  brightnessContrastPass.uniforms.contrast.value = 0 // Adjust contrast
   composer.addPass(brightnessContrastPass)
 
   const stats = new Stats()
   stats.dom.style.position = 'fixed'
-  stats.dom.style.right = '16px'
-  stats.dom.style.top = '16px'
-  stats.dom.style.left = ''
+  stats.dom.style.left = '16px'
+  stats.dom.style.bottom = '16px'
+  stats.dom.style.top = ''
   container.appendChild(stats.dom)
 
   const animate = () => {
@@ -76,5 +65,19 @@ export function useCharModel(container: HTMLElement) {
     composer.render()
     stats.end()
   }
-  animate()
+
+  let model: THREE.Object3D | undefined = undefined
+  const Load = (char: string) => {
+    if (model != undefined) {
+      scene.remove(model)
+    }
+    const loader = new MMDLoader()
+    loader.load(`/chars/${char}/${char}.pmx`, (m: any) => {
+      m.position.y = -12
+      model = m
+      scene.add(model!)
+    })
+    animate()
+  }
+  return { Load }
 }
