@@ -1,0 +1,19 @@
+html.dark {
+  background-color: #12121c;
+  --el-bg-color: #12121c;
+  --el-bg-color-overlay: #12121c;
+}
+
+.el-card {
+  --el-card-padding: 20px;
+  background-color: rgba(0, 0, 0, 0.24);
+  --el-card-border-color: #112;
+}
+.el-card__body {
+  padding: 10px;
+}
+
+.el-table-v2__main,
+.el-table-v2__header-cell {
+  background-color: rgba(0, 0, 0, 0);
+}
