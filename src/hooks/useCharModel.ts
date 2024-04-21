@@ -34,7 +34,7 @@ export function useCharModel(container: HTMLElement) {
   camera.lookAt(new THREE.Vector3(0, 0, 0))
 
   // Ambient light
-  const ambientLight = new THREE.AmbientLight(0xffe0ff, 2)
+  const ambientLight = new THREE.AmbientLight(0xffeeff, 2)
   scene.add(ambientLight)
 
   // Directional light
@@ -122,7 +122,7 @@ export function useCharModel(container: HTMLElement) {
 
     const mmdFile = `/chars/${char}/${char}.pmx`
     const vmdFiles = ['/motions/roll.vmd']
-    const vpdFile = '/poses/2.vpd'
+    const vpdFile = '/poses/4.vpd'
     if (LoadedModels[char] == undefined) {
       loader.loadWithAnimation(mmdFile, vmdFiles, (mmd: any) => {
         const mesh = mmd.mesh
