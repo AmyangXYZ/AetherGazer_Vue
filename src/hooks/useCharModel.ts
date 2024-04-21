@@ -7,7 +7,8 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
 import { BrightnessContrastShader } from 'three/examples/jsm/shaders/BrightnessContrastShader'
-
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
+import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass'
 import Stats from 'three/addons/libs/stats.module.js'
 import { LoadedModels } from './useStates'
 
@@ -21,22 +22,28 @@ export function useCharModel(container: HTMLElement) {
   renderer.outputColorSpace = THREE.SRGBColorSpace
   renderer.shadowMap.enabled = true
   renderer.toneMapping = THREE.ReinhardToneMapping
-  renderer.toneMappingExposure = 1.2
+  renderer.toneMappingExposure = 1
 
   const camera = new THREE.PerspectiveCamera(
     50,
     container.clientWidth / container.clientHeight,
-    0.1,
+    1,
     100
   )
-  camera.position.set(0, 3, 15)
+  camera.position.set(-2, 3, 15)
   camera.lookAt(new THREE.Vector3(0, 0, 0))
 
-  const ambient = new THREE.AmbientLight(0xffffff, 2)
-  scene.add(ambient)
+  // Ambient light
+  const ambientLight = new THREE.AmbientLight(0xffe0ff, 2)
+  scene.add(ambientLight)
 
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5)
-  directionalLight.position.set(-1, -1, 1).normalize()
+  // Directional light
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 1.8)
+  directionalLight.position.set(-2, 10, 18)
+  directionalLight.castShadow = true
+  directionalLight.shadow.bias = -0.001
+  directionalLight.shadow.mapSize.width = 2048
+  directionalLight.shadow.mapSize.height = 2048
   scene.add(directionalLight)
 
   const controls = new OrbitControls(camera, renderer.domElement)
@@ -53,6 +60,31 @@ export function useCharModel(container: HTMLElement) {
   const composer = new EffectComposer(renderer)
   const renderPass = new RenderPass(scene, camera)
   composer.addPass(renderPass)
+
+  const outlinePass = new OutlinePass(
+    new THREE.Vector2(container.clientWidth, container.clientHeight),
+    scene,
+    camera
+  )
+  outlinePass.edgeStrength = 2
+  outlinePass.edgeGlow = 1
+  outlinePass.edgeThickness = 1
+  outlinePass.pulsePeriod = 0
+  outlinePass.usePatternTexture = false // patter texture for an object mesh
+  outlinePass.visibleEdgeColor.set('#000000') // set basic edge color
+  // outlinePass.hiddenEdgeColor.set('#000000') // set edge color when it hidden by other objects
+  composer.addPass(outlinePass)
+
+  const bloomPass = new UnrealBloomPass(
+    new THREE.Vector2(window.innerWidth, window.innerHeight),
+    1,
+    1,
+    1
+  )
+  bloomPass.threshold = 0.2 // Adjust the luminance threshold for bloom
+  bloomPass.strength = 0.06 // Increase the bloom strength
+  bloomPass.radius = 20 // Increase the bloom radius
+  composer.addPass(bloomPass)
 
   const brightnessContrastPass = new ShaderPass(BrightnessContrastShader)
   brightnessContrastPass.uniforms.brightness.value = 0 // Adjust brightness
@@ -74,6 +106,9 @@ export function useCharModel(container: HTMLElement) {
     requestAnimationFrame(animate)
     stats.begin()
     composer.render()
+    if (model != undefined) {
+      outlinePass.selectedObjects = [model]
+    }
     animationHelper.update(clock.getDelta())
     stats.end()
   }
@@ -91,10 +126,13 @@ export function useCharModel(container: HTMLElement) {
     if (LoadedModels[char] == undefined) {
       loader.loadWithAnimation(mmdFile, vmdFiles, (mmd: any) => {
         const mesh = mmd.mesh
+        mesh.castShadow = true // Enable casting shadows
+        mesh.receiveShadow = true // Enable receiving shadows
         mesh.position.y = -15
         model = mesh
         LoadedModels[char] = model
         scene.add(model!)
+
         loader.loadVPD(vpdFile, false, function (vpd: any) {
           animationHelper.pose(model, vpd)
         })
@@ -116,6 +154,7 @@ export function useCharModel(container: HTMLElement) {
       scene.add(model!)
     }
   }
+
   animate()
   return { Load }
 }
