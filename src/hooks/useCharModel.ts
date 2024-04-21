@@ -39,7 +39,7 @@ export function useCharModel(container: HTMLElement) {
 
   // Directional light
   const directionalLight = new THREE.DirectionalLight(0xffffff, 1.8)
-  directionalLight.position.set(-2, 10, 18)
+  directionalLight.position.set(-2, 7, 18)
   directionalLight.castShadow = true
   directionalLight.shadow.bias = -0.001
   directionalLight.shadow.mapSize.width = 2048
@@ -83,7 +83,7 @@ export function useCharModel(container: HTMLElement) {
   )
   bloomPass.threshold = 0.2 // Adjust the luminance threshold for bloom
   bloomPass.strength = 0.06 // Increase the bloom strength
-  bloomPass.radius = 20 // Increase the bloom radius
+  bloomPass.radius = 25 // Increase the bloom radius
   composer.addPass(bloomPass)
 
   const brightnessContrastPass = new ShaderPass(BrightnessContrastShader)
@@ -115,14 +115,14 @@ export function useCharModel(container: HTMLElement) {
 
   let model: THREE.Object3D | undefined = undefined
   const loader = new MMDLoader()
-  const Load = (char: string) => {
+  const LoadChar = (char: string) => {
     if (model != undefined) {
       scene.remove(model)
     }
 
     const mmdFile = `/chars/${char}/${char}.pmx`
     const vmdFiles = ['/motions/roll.vmd']
-    const vpdFile = '/poses/4.vpd'
+
     if (LoadedModels[char] == undefined) {
       loader.loadWithAnimation(mmdFile, vmdFiles, (mmd: any) => {
         const mesh = mmd.mesh
@@ -131,11 +131,10 @@ export function useCharModel(container: HTMLElement) {
         mesh.position.y = -15
         model = mesh
         LoadedModels[char] = model
+        LoadPose('1')
+
         scene.add(model!)
 
-        loader.loadVPD(vpdFile, false, function (vpd: any) {
-          animationHelper.pose(model, vpd)
-        })
         animationHelper.add(model, {
           // animation: mmd.animation,
           physics: true
@@ -155,6 +154,11 @@ export function useCharModel(container: HTMLElement) {
     }
   }
 
+  const LoadPose = (pose: string) => {
+    loader.loadVPD(`/poses/${pose}.vpd`, false, function (vpd: any) {
+      animationHelper.pose(model, vpd)
+    })
+  }
   animate()
-  return { Load }
+  return { LoadChar, LoadPose }
 }

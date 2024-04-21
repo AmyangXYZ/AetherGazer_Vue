@@ -5,16 +5,19 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useCharModel } from '@/hooks/useCharModel'
-import { SelectedChar } from '@/hooks/useStates'
+import { SelectedChar, SelectedPose } from '@/hooks/useStates'
 
 const container = ref()
 
 onMounted(() => {
-  const { Load } = useCharModel(container.value)
-  Load(SelectedChar.value)
+  const { LoadChar, LoadPose } = useCharModel(container.value)
+  LoadChar(SelectedChar.value)
 
   watch(SelectedChar, () => {
-    Load(SelectedChar.value)
+    LoadChar(SelectedChar.value)
+  })
+  watch(SelectedPose, () => {
+    LoadPose(SelectedPose.value)
   })
 })
 </script>
