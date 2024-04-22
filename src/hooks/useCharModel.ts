@@ -63,7 +63,6 @@ export function useCharModel(container: HTMLElement) {
         ikHelper.visible = false
         scene.add(ikHelper)
 
-        // animationHelper.objects.get(model).physics.setGravity(new THREE.Vector3(0, 2, 0))
         physicsHelper = animationHelper.objects.get(mesh).physics.createHelper()
         physicsHelper.visible = true
         scene.add(physicsHelper)
@@ -113,8 +112,36 @@ export function useCharModel(container: HTMLElement) {
     scene.add(directionalLight)
 
     const controls = new OrbitControls(camera, renderer.domElement)
-    controls.minDistance = 1
-    controls.maxDistance = 100
+    controls.mouseButtons = {
+      LEFT: undefined,
+      RIGHT: THREE.MOUSE.ROTATE
+    }
+
+    let isDragging = false
+    let previousMousePosition = { x: 0, y: 0 }
+
+    window.addEventListener('mousedown', (event: MouseEvent) => {
+      if (event.button == 0) {
+        isDragging = true
+        previousMousePosition = { x: event.clientX, y: event.clientY }
+      }
+    })
+    window.addEventListener('mouseup', () => {
+      isDragging = false
+    })
+    window.addEventListener('mousemove', (event: MouseEvent) => {
+      if (!isDragging) return
+      const deltaMove = {
+        x: event.clientX - previousMousePosition.x,
+        y: event.clientY - previousMousePosition.y
+      }
+
+      if (model) {
+        model.rotation.y += deltaMove.x * 0.01
+      }
+
+      previousMousePosition = { x: event.clientX, y: event.clientY }
+    })
 
     const resizeHandler = () => {
       camera.aspect = container.clientWidth / container.clientHeight
@@ -138,7 +165,7 @@ export function useCharModel(container: HTMLElement) {
     outlinePass.pulsePeriod = 0
     outlinePass.usePatternTexture = false // patter texture for an object mesh
     outlinePass.visibleEdgeColor.set('#000000') // set basic edge color
-    // outlinePass.hiddenEdgeColor.set('#000000') // set edge color when it hidden by other objects
+    outlinePass.hiddenEdgeColor.set('#000000') // set edge color when it hidden by other objects
     composer.addPass(outlinePass)
 
     const bloomPass = new UnrealBloomPass(
@@ -172,7 +199,6 @@ export function useCharModel(container: HTMLElement) {
 
     if (model != undefined) {
       outlinePass.selectedObjects = [model]
-      // model.rotation.y -= 0.005
     }
     stats.end()
   }
