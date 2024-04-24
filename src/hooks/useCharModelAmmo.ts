@@ -43,17 +43,10 @@ export function useCharModel(container: HTMLElement) {
         const mesh = mmd.mesh
         mesh.castShadow = true // Enable casting shadows
         mesh.receiveShadow = true // Enable receiving shadows
-        mesh.position.y = -15
+        mesh.position.y = -13
         model = mesh
         LoadedModels[char] = model
-        model!.visible = false
-
-        const bodies = model.geometry.userData.MMD.rigidBodies
-        const constraints = model.geometry.userData.MMD.constraints
-        for (const c of constraints) {
-          console.log(c)
-        }
-
+        model!.visible = true
         // LoadPose(SelectedPose.value)
         scene.add(model!)
 

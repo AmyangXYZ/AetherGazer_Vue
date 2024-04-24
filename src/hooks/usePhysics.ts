@@ -45,7 +45,7 @@ export class RMPhysics {
   }
 
   addGround(y: number) {
-    const groundGeometry = new THREE.PlaneGeometry(10, 10)
+    const groundGeometry = new THREE.PlaneGeometry(40, 40)
     const groundMaterial = new THREE.MeshBasicMaterial({ color: 0x333333 })
     const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial)
     groundMesh.rotation.x = -Math.PI / 2
@@ -58,7 +58,7 @@ export class RMPhysics {
       groundMesh.position.z
     )
     const groundBody = this.world.createRigidBody(groundBodyDesc)
-    const groundColliderDesc = RAPIER.ColliderDesc.cuboid(5, 0.1, 5)
+    const groundColliderDesc = RAPIER.ColliderDesc.cuboid(20, 0.1, 20)
     this.world.createCollider(groundColliderDesc, groundBody)
   }
 

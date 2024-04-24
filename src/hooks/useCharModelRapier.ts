@@ -6,7 +6,7 @@ import { MMDAnimationHelper } from 'three/examples/jsm/animation/MMDAnimationHel
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect.js'
 import Stats from 'three/addons/libs/stats.module.js'
-import { MMDPhysics } from './usePhysics'
+import { RMPhysics } from './usePhysics'
 
 export function useCharModel(container: HTMLElement) {
   let renderer: any, camera: any
@@ -19,7 +19,7 @@ export function useCharModel(container: HTMLElement) {
   let effect: OutlineEffect
   const scene = new THREE.Scene()
 
-  const physics = new MMDPhysics(scene)
+  const physics = new RMPhysics(scene)
   physics.addGround(-15)
   physics.showHelper()
 
@@ -39,7 +39,7 @@ export function useCharModel(container: HTMLElement) {
         const mesh = m.mesh
         mesh.castShadow = true // Enable casting shadows
         mesh.receiveShadow = true // Enable receiving shadows
-        mesh.position.y = -10
+        mesh.position.y = -13
         model = mesh
         LoadedModels[char] = model
 
