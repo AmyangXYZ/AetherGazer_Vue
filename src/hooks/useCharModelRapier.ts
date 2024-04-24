@@ -39,23 +39,21 @@ export function useCharModel(container: HTMLElement) {
         const mesh = m.mesh
         mesh.castShadow = true // Enable casting shadows
         mesh.receiveShadow = true // Enable receiving shadows
-        mesh.position.y = -15
+        mesh.position.y = -10
         model = mesh
         LoadedModels[char] = model
 
         // LoadPose(SelectedPose.value)
         scene.add(model!)
 
-        physics.addMMD(model)
-
         animationHelper.add(model, {
           // animation: mmd.animation,
           physics: false // disable Ammojs-based physics
         })
 
-        physics.addMMD(model)
+        physics.addMMD(model!)
 
-        scene.add(new THREE.SkeletonHelper(model!))
+        // scene.add(new THREE.SkeletonHelper(model!))
       })
     } else {
       model = LoadedModels[char]
