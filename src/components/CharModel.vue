@@ -4,7 +4,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import { useCharModel } from '@/hooks/useCharModel'
+// import { useCharModel } from '@/hooks/useCharModelAmmo'
+import { useCharModel } from '@/hooks/useCharModelRapier'
 import { SelectedChar, SelectedPose } from '@/hooks/useStates'
 
 const container = ref()
