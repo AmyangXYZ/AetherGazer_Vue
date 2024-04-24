@@ -26,7 +26,7 @@ onMounted(() => {
 <style scoped>
 .char {
   position: absolute;
-  width: 640px;
+  width: 100%;
   height: 100vh;
   z-index: 999;
 }

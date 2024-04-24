@@ -9,7 +9,7 @@ import UserProfile from '@/components/UserProfile.vue'
 <template>
   <HomeBase />
   <UserProfile />
-  <ToolBar />
-  <NavBar />
-  <StatsBar />
+  <ToolBar v-show="false" />
+  <NavBar v-show="false" />
+  <StatsBar v-show="false" />
 </template>

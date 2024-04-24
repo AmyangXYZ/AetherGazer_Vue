@@ -24,7 +24,7 @@ export class RMPhysics {
   step() {
     this.updateRigidBodies()
     this.world.step()
-    // this.updateBones()
+    this.updateBones()
 
     if (this.helperEnabled) {
       const { vertices, colors } = this.world.debugRender()
@@ -44,9 +44,9 @@ export class RMPhysics {
     this.helperEnabled = false
   }
 
-  addGround(y: number) {
-    const groundGeometry = new THREE.PlaneGeometry(40, 40)
-    const groundMaterial = new THREE.MeshBasicMaterial({ color: 0x333333 })
+  addGround(width: number, y: number) {
+    const groundGeometry = new THREE.PlaneGeometry(width, width)
+    const groundMaterial = new THREE.MeshBasicMaterial({ vertexColors: true })
     const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial)
     groundMesh.rotation.x = -Math.PI / 2
     groundMesh.position.y = y
@@ -58,13 +58,13 @@ export class RMPhysics {
       groundMesh.position.z
     )
     const groundBody = this.world.createRigidBody(groundBodyDesc)
-    const groundColliderDesc = RAPIER.ColliderDesc.cuboid(20, 0.1, 20)
+    const groundColliderDesc = RAPIER.ColliderDesc.cuboid(width / 2, 0.1, width / 2)
     this.world.createCollider(groundColliderDesc, groundBody)
   }
 
   addMMD(mesh: THREE.Object3D) {
     this.mesh = mesh
-    this.mesh.visible = false
+    // this.mesh.visible = false
 
     this.createRigidBodies()
     this.addConstraints()
@@ -74,24 +74,19 @@ export class RMPhysics {
     this.bodies = this.mesh.geometry.userData.MMD.rigidBodies.map((param: any) => {
       const bone =
         param.boneIndex == -1 ? new THREE.Bone() : this.mesh.skeleton.bones[param.boneIndex]
+
       const bonePosition = new THREE.Vector3()
       const boneQuaternion = new THREE.Quaternion()
+      const boneScale = new THREE.Vector3()
       bone.getWorldPosition(bonePosition)
       bone.getWorldQuaternion(boneQuaternion)
-
-      const boneScale = new THREE.Vector3()
       bone.getWorldScale(boneScale)
-
       const boneMatrix = new THREE.Matrix4()
       boneMatrix.compose(bonePosition, boneQuaternion, boneScale)
 
-      const offsetPosition = new THREE.Vector3(
-        param.position[0],
-        param.position[1],
-        param.position[2]
-      )
+      const offsetPosition = new THREE.Vector3(...param.position)
       const offsetQuaternion = new THREE.Quaternion().setFromEuler(
-        new THREE.Euler(param.rotation[0], param.rotation[1], param.rotation[2])
+        new THREE.Euler(...param.rotation)
       )
       const offsetMatrix = new THREE.Matrix4()
       offsetMatrix.compose(offsetPosition, offsetQuaternion, new THREE.Vector3(1, 1, 1))
@@ -110,12 +105,16 @@ export class RMPhysics {
       } else {
         rigidBodyDesc = RAPIER.RigidBodyDesc.dynamic()
       }
-      rigidBodyDesc.setTranslation(finalPosition.x, finalPosition.y, finalPosition.z).setRotation({
-        x: finalQuaternion.x,
-        y: finalQuaternion.y,
-        z: finalQuaternion.z,
-        w: finalQuaternion.w
-      })
+      rigidBodyDesc
+        .setTranslation(finalPosition.x, finalPosition.y, finalPosition.z)
+        .setRotation({
+          x: finalQuaternion.x,
+          y: finalQuaternion.y,
+          z: finalQuaternion.z,
+          w: finalQuaternion.w
+        })
+        .setLinearDamping(param.positionDamping)
+        .setAngularDamping(param.rotationDamping)
 
       const rigidBody = this.world.createRigidBody(rigidBodyDesc)
       rigidBody.userData = param
@@ -123,13 +122,17 @@ export class RMPhysics {
       let colliderDesc: any
       switch (param.shapeType) {
         case 0:
-          colliderDesc = RAPIER.ColliderDesc.ball(param.width)
+          colliderDesc = RAPIER.ColliderDesc.ball(param.width / 2)
           break
         case 1:
-          colliderDesc = RAPIER.ColliderDesc.cuboid(param.width, param.height, param.depth)
+          colliderDesc = RAPIER.ColliderDesc.cuboid(
+            param.width / 2,
+            param.height / 2,
+            param.depth / 2
+          )
           break
         case 2:
-          colliderDesc = RAPIER.ColliderDesc.capsule(param.height / 2, param.width)
+          colliderDesc = RAPIER.ColliderDesc.capsule(param.height / 2, param.width / 2)
           break
         default:
           console.error('Unknown shape type', param.shapeType)
@@ -147,42 +150,97 @@ export class RMPhysics {
   }
 
   private addConstraints() {
-    this.mesh.geometry.userData.MMD.constraints.forEach((constraint: any) => {
-      const bodyA = this.bodies[constraint.rigidBodyIndex1]
-      const bodyB = this.bodies[constraint.rigidBodyIndex2]
-      const anchor1 = new THREE.Vector3(...constraint.position)
-      const anchor2 = new THREE.Vector3(...constraint.position)
+    this.mesh.geometry.userData.MMD.constraints.forEach((param: any) => {
+      const bodyA = this.bodies[param.rigidBodyIndex1]
+      const bodyB = this.bodies[param.rigidBodyIndex2]
+      const constraintPosition = new THREE.Vector3(...param.position)
+      const constraintRotation = new THREE.Quaternion().setFromEuler(
+        new THREE.Euler(...param.rotation)
+      )
+      const constraintMatrix = new THREE.Matrix4()
+      constraintMatrix.compose(constraintPosition, constraintRotation, new THREE.Vector3(1, 1, 1))
 
-      // const params = RAPIER.JointData.spring( anchor1, anchor2)
-      // this.world.createImpulseJoint(params, bodyA, bodyB, true)
-      console.log(constraint, bodyA)
+      const posA = bodyA.translation()
+      const rotA = bodyA.rotation()
+      const bodyAPosition = new THREE.Vector3(posA.x, posA.y, posA.z)
+      const bodyAQuaternion = new THREE.Quaternion(rotA.x, rotA.y, rotA.z, rotA.w)
+      const bodyAMatrix = new THREE.Matrix4()
+      bodyAMatrix.compose(bodyAPosition, bodyAQuaternion, new THREE.Vector3(1, 1, 1))
+
+      const posB = bodyB.translation()
+      const rotB = bodyB.rotation()
+      const bodyBPosition = new THREE.Vector3(posB.x, posB.y, posB.z)
+      const bodyBQuaternion = new THREE.Quaternion(rotB.x, rotB.y, rotB.z, rotB.w)
+      const bodyBMatrix = new THREE.Matrix4()
+      bodyBMatrix.compose(bodyBPosition, bodyBQuaternion, new THREE.Vector3(1, 1, 1))
+
+      const inverseBodyAMatrix = new THREE.Matrix4().copy(bodyAMatrix).invert()
+      const inverseBodyBMatrix = new THREE.Matrix4().copy(bodyBMatrix).invert()
+
+      const constraintMatrixA = new THREE.Matrix4().multiplyMatrices(
+        inverseBodyAMatrix,
+        constraintMatrix
+      )
+      const constraintMatrixB = new THREE.Matrix4().multiplyMatrices(
+        inverseBodyBMatrix,
+        constraintMatrix
+      )
+
+      const anchorA = new THREE.Vector3()
+      const anchorB = new THREE.Vector3()
+      constraintMatrixA.decompose(anchorA, new THREE.Quaternion(), new THREE.Vector3())
+      constraintMatrixB.decompose(anchorB, new THREE.Quaternion(), new THREE.Vector3())
+
+      const axes = [
+        { x: 1, y: 0, z: 0 }, // X-axis
+        { x: 0, y: 1, z: 0 }, // Y-axis
+        { x: 0, y: 0, z: 1 } // Z-axis
+      ]
+      const linearMasks = [RAPIER.JointAxesMask.X, RAPIER.JointAxesMask.Y, RAPIER.JointAxesMask.Z]
+      const angularMasks = [
+        RAPIER.JointAxesMask.AngX,
+        RAPIER.JointAxesMask.AngY,
+        RAPIER.JointAxesMask.AngZ
+      ]
+      for (let i = 0; i < 3; i++) {
+        const jointLinear = RAPIER.JointData.generic(anchorA, anchorB, axes[i], linearMasks[i])
+        jointLinear.limitsEnabled = true
+        jointLinear.limits = [param.translationLimitation1[i], param.translationLimitation2[i]]
+        if (param.springRotation[i] != 0) {
+          jointLinear.stiffness = param.springPosition[i]
+        }
+        this.world.createImpulseJoint(jointLinear, bodyA, bodyB, true)
+      }
+
+      for (let i = 0; i < 3; i++) {
+        const jointAngular = RAPIER.JointData.generic(anchorA, anchorB, axes[i], angularMasks[i])
+        jointAngular.limitsEnabled = true
+        jointAngular.limits = [param.rotationLimitation1[i], param.rotationLimitation2[i]]
+        if (param.springRotation[i] != 0) {
+          jointAngular.stiffness = param.springRotation[i]
+        }
+        this.world.createImpulseJoint(jointAngular, bodyA, bodyB, true)
+      }
     })
   }
 
   private updateRigidBodies() {
     if (this.mesh !== undefined) {
-      this.bodies.forEach((rb: any, index: number) => {
-        const param = rb.userData
+      this.bodies.forEach((rb: RAPIER.RigidBody) => {
+        const param: any = rb.userData
         if (param.boneIndex !== -1 && param.type === 0) {
           const bone = this.mesh.skeleton.bones[param.boneIndex]
-          const rigidBody = this.bodies[index]
 
           const bonePosition = new THREE.Vector3()
           const boneQuaternion = new THREE.Quaternion()
           bone.getWorldPosition(bonePosition)
           bone.getWorldQuaternion(boneQuaternion)
-
-          const boneScale = new THREE.Vector3(1, 1, 1)
           const boneMatrix = new THREE.Matrix4()
-          boneMatrix.compose(bonePosition, boneQuaternion, boneScale)
+          boneMatrix.compose(bonePosition, boneQuaternion, new THREE.Vector3(1, 1, 1))
 
-          const offsetPosition = new THREE.Vector3(
-            param.position[0],
-            param.position[1],
-            param.position[2]
-          )
+          const offsetPosition = new THREE.Vector3(...param.position)
           const offsetQuaternion = new THREE.Quaternion().setFromEuler(
-            new THREE.Euler(param.rotation[0], param.rotation[1], param.rotation[2])
+            new THREE.Euler(...param.rotation)
           )
           const offsetMatrix = new THREE.Matrix4()
           offsetMatrix.compose(offsetPosition, offsetQuaternion, new THREE.Vector3(1, 1, 1))
@@ -194,12 +252,12 @@ export class RMPhysics {
           const finalQuaternion = new THREE.Quaternion()
           finalMatrix.decompose(finalPosition, finalQuaternion, new THREE.Vector3())
 
-          rigidBody.setNextKinematicTranslation({
+          rb.setNextKinematicTranslation({
             x: finalPosition.x,
             y: finalPosition.y,
             z: finalPosition.z
           })
-          rigidBody.setNextKinematicRotation({
+          rb.setNextKinematicRotation({
             x: finalQuaternion.x,
             y: finalQuaternion.y,
             z: finalQuaternion.z,
@@ -213,13 +271,11 @@ export class RMPhysics {
   // update bone from body
   private updateBones() {
     if (this.mesh !== undefined) {
-      this.bodies.forEach((rb: any, index: number) => {
-        const param = rb.userData
-        if (param.boneIndex !== -1 && param.type === 0) {
-          const bone = this.mesh.skeleton.bones[param.boneIndex]
-          const rigidBody = this.bodies[index]
-          const position = rigidBody.translation()
-          const rotation = rigidBody.rotation()
+      for (const rb of this.bodies) {
+        const param: any = rb.userData
+        if (param.boneIndex != -1 && param.type == 1) {
+          const position = rb.translation()
+          const rotation = rb.rotation()
           const rigidBodyMatrix = new THREE.Matrix4()
           const rigidBodyPosition = new THREE.Vector3(position.x, position.y, position.z)
           const rigidBodyQuaternion = new THREE.Quaternion(
@@ -233,27 +289,29 @@ export class RMPhysics {
             rigidBodyQuaternion,
             new THREE.Vector3(1, 1, 1)
           )
-          const offsetMatrix = new THREE.Matrix4()
-          const offsetPosition = new THREE.Vector3(
-            -param.position[0],
-            -param.position[1],
-            -param.position[2]
-          )
+
+          const offsetPosition = new THREE.Vector3(...param.position)
           const offsetQuaternion = new THREE.Quaternion().setFromEuler(
-            new THREE.Euler(-param.rotation[0], -param.rotation[1], -param.rotation[2])
+            new THREE.Euler(...param.rotation)
           )
+          const offsetMatrix = new THREE.Matrix4()
           offsetMatrix.compose(offsetPosition, offsetQuaternion, new THREE.Vector3(1, 1, 1))
-          const boneMatrix = new THREE.Matrix4()
-          boneMatrix.multiplyMatrices(rigidBodyMatrix, offsetMatrix)
-          const bonePosition = new THREE.Vector3()
-          const boneQuaternion = new THREE.Quaternion()
-          const boneScale = new THREE.Vector3()
-          boneMatrix.decompose(bonePosition, boneQuaternion, boneScale)
-          bone.position.copy(bonePosition)
-          bone.quaternion.copy(boneQuaternion)
+          const finalMatrix = new THREE.Matrix4()
+
+          finalMatrix.multiplyMatrices(rigidBodyMatrix, offsetMatrix.invert())
+
+          const finalPosition = new THREE.Vector3()
+          const finalQuaternion = new THREE.Quaternion()
+          finalMatrix.decompose(finalPosition, finalQuaternion, new THREE.Vector3())
+
+          const bone = this.mesh.skeleton.bones[param.boneIndex]
+          if (bone.parent != undefined) {
+            bone.position.copy(bone.parent.worldToLocal(finalPosition))
+          } else {
+            bone.position.copy(finalPosition)
+          }
         }
-      })
-      this.mesh.skeleton.update()
+      }
     }
   }
 }

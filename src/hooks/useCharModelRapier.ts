@@ -20,7 +20,7 @@ export function useCharModel(container: HTMLElement) {
   const scene = new THREE.Scene()
 
   const physics = new RMPhysics(scene)
-  physics.addGround(-15)
+  physics.addGround(80, -12)
   physics.showHelper()
 
   const LoadChar = (char: string) => {
@@ -39,7 +39,7 @@ export function useCharModel(container: HTMLElement) {
         const mesh = m.mesh
         mesh.castShadow = true // Enable casting shadows
         mesh.receiveShadow = true // Enable receiving shadows
-        mesh.position.y = -13
+        mesh.position.y = -12
         model = mesh
         LoadedModels[char] = model
 
@@ -47,13 +47,13 @@ export function useCharModel(container: HTMLElement) {
         scene.add(model!)
 
         animationHelper.add(model, {
-          // animation: mmd.animation,
+          // animation: m.animation,
           physics: false // disable Ammojs-based physics
         })
 
         physics.addMMD(model!)
 
-        // scene.add(new THREE.SkeletonHelper(model!))
+        scene.add(new THREE.SkeletonHelper(model!))
       })
     } else {
       model = LoadedModels[char]
@@ -77,7 +77,7 @@ export function useCharModel(container: HTMLElement) {
     effect = new OutlineEffect(renderer)
 
     camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 1, 100)
-    camera.position.set(-2, 8, 15)
+    camera.position.set(0, 10, 20)
     camera.lookAt(new THREE.Vector3(0, 0, 0))
 
     // Ambient light

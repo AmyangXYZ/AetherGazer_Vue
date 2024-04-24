@@ -1,5 +1,5 @@
 <template>
-  <CharModel ref="char" style="left: 10%" @click="toggleButtonGroup" />
+  <CharModel ref="char" @click="toggleButtonGroup" />
   <div v-if="buttonGroupVisible" class="button-group" :style="buttonGroupStyle">
     <el-tooltip effect="light" content="Switch char" :hide-after="0" placement="bottom-start">
       <RouterLink to="/chars">
