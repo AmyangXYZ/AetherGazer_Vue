@@ -28,6 +28,6 @@ onMounted(() => {
   position: absolute;
   width: 100%;
   height: 100vh;
-  z-index: 999;
+  z-index: 1;
 }
 </style>

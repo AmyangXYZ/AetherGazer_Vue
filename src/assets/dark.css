@@ -9,6 +9,8 @@ html.dark {
   background-color: rgba(0, 0, 0, 0.24);
   --el-card-border-color: #112;
 } */
-.el-card__body {
+.el-card__header {
+  background-color: #1b2726;
   padding: 10px;
+  /* text-align: center; */
 }

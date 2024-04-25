@@ -52,8 +52,6 @@ export function useCharModel(container: HTMLElement) {
         })
 
         physics.addMMD(model!)
-
-        scene.add(new THREE.SkeletonHelper(model!))
       })
     } else {
       model = LoadedModels[char]
@@ -109,16 +107,16 @@ export function useCharModel(container: HTMLElement) {
 
     let isDragging = false
     let previousMousePosition = { x: 0, y: 0 }
-    window.addEventListener('mousedown', (event: MouseEvent) => {
+    container.addEventListener('mousedown', (event: MouseEvent) => {
       if (event.button == 0) {
         isDragging = true
         previousMousePosition = { x: event.clientX, y: event.clientY }
       }
     })
-    window.addEventListener('mouseup', () => {
+    container.addEventListener('mouseup', () => {
       isDragging = false
     })
-    window.addEventListener('mousemove', (event: MouseEvent) => {
+    container.addEventListener('mousemove', (event: MouseEvent) => {
       if (!isDragging) return
       const deltaMove = {
         x: event.clientX - previousMousePosition.x,
