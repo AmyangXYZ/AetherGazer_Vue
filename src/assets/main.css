@@ -1,1 +1,19 @@
 @import './base.css';
+
+.el-card {
+  --el-card-padding: 10px;
+  background-color: rgb(24, 28, 32);
+  --el-card-border-color: #112;
+  border-radius: 10px;
+}
+.el-card__body {
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 16px;
+}
+.el-card__header {
+  background-color: rgb(41, 45, 57);
+  padding-top: 5px;
+  padding-bottom: 5px;
+  /* text-align: center; */
+}

@@ -1,12 +1,13 @@
-// import { ref } from 'vue'
-import { LoadedModels, SelectedPose } from './useStates'
+import { watch } from 'vue'
+
+import { SelectedPose, ShowSkin, ShowSkeleton, ShowRigidBodies, SelectedChar } from './useStates'
 import * as THREE from 'three'
 import { MMDLoader } from 'three/examples/jsm/loaders/MMDLoader'
 import { MMDAnimationHelper } from 'three/examples/jsm/animation/MMDAnimationHelper'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect.js'
 import Stats from 'three/addons/libs/stats.module.js'
-import { RMPhysics } from './usePhysics'
+import { RMPhysics } from './physics'
 
 export function useCharModel(container: HTMLElement) {
   let renderer: any, camera: any
@@ -15,13 +16,14 @@ export function useCharModel(container: HTMLElement) {
   const animationHelper = new MMDAnimationHelper({ afterglow: 2.0 })
 
   const loader = new MMDLoader()
+  const LoadedModels: { [name: string]: THREE.Object3D | undefined } = {}
+
   let model: THREE.Object3D | undefined = undefined
   let effect: OutlineEffect
   const scene = new THREE.Scene()
 
   const physics = new RMPhysics(scene)
   physics.addGround(80, -12)
-  physics.showHelper()
 
   const LoadChar = (char: string) => {
     if (model != undefined) {
@@ -52,10 +54,12 @@ export function useCharModel(container: HTMLElement) {
         })
 
         physics.addMMD(model!)
+        model!.visible = ShowSkin.value
       })
     } else {
       model = LoadedModels[char]
       scene.add(model!)
+      model!.visible = ShowSkin.value
     }
   }
 
@@ -98,7 +102,7 @@ export function useCharModel(container: HTMLElement) {
     container.appendChild(stats.dom)
   }
 
-  const initEventHandlers = () => {
+  const setEventHandlers = () => {
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.mouseButtons = {
       LEFT: undefined,
@@ -137,6 +141,38 @@ export function useCharModel(container: HTMLElement) {
     }
     window.addEventListener('resize', resizeHandler)
   }
+  const setWatchers = () => {
+    watch(ShowSkin, () => {
+      if (model != undefined) {
+        model.visible = ShowSkin.value
+      }
+    })
+
+    let skeletonHelper: THREE.SkeletonHelper | undefined = undefined
+    watch(ShowSkeleton, () => {
+      if (model != undefined) {
+        if (ShowSkeleton.value) {
+          skeletonHelper = new THREE.SkeletonHelper(model)
+          scene.add(skeletonHelper)
+        } else {
+          scene.remove(skeletonHelper!)
+          skeletonHelper = undefined
+        }
+      }
+    })
+
+    watch(
+      ShowRigidBodies,
+      () => {
+        if (ShowRigidBodies.value) {
+          physics.showHelper()
+        } else {
+          physics.hideHelper()
+        }
+      },
+      { immediate: true }
+    )
+  }
 
   const animate = () => {
     requestAnimationFrame(animate)
@@ -150,12 +186,12 @@ export function useCharModel(container: HTMLElement) {
     stats.end()
   }
 
-  const main = () => {
-    initScene()
-    initEventHandlers()
+  // main
+  initScene()
+  setEventHandlers()
+  LoadChar(SelectedChar.value)
+  setWatchers()
+  animate()
 
-    animate()
-  }
-  main()
   return { LoadChar, LoadPose }
 }

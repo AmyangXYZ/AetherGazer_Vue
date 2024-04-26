@@ -3,14 +3,3 @@ html.dark {
   --el-bg-color: #12121c;
   --el-bg-color-overlay: #12121c;
 }
-
-/* .el-card {
-  --el-card-padding: 20px;
-  background-color: rgba(0, 0, 0, 0.24);
-  --el-card-border-color: #112;
-} */
-.el-card__header {
-  background-color: #1b2726;
-  padding: 10px;
-  /* text-align: center; */
-}

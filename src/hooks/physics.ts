@@ -12,16 +12,18 @@ export class RMPhysics {
   helperEnabled: boolean = false
   helperLineGeometry = new THREE.BufferGeometry()
   helperLineMaterial = new THREE.LineBasicMaterial({ vertexColors: false })
+  helperLineSegments: THREE.LineSegments
 
   constructor(scene: THREE.Scene) {
     this.scene = scene
     this.gravity = { x: 0.0, y: -9.8, z: 0.0 }
     this.world = new RAPIER.World(this.gravity)
 
-    // helper lines
-    scene.add(new THREE.LineSegments(this.helperLineGeometry, this.helperLineMaterial))
-
-    // this.createRevoluteJoints(new RAPIER.Vector3(0.0, -2.0, 0.0), 1)
+    // physics helper lines
+    this.helperLineSegments = new THREE.LineSegments(
+      this.helperLineGeometry,
+      this.helperLineMaterial
+    )
   }
 
   step() {
@@ -38,13 +40,6 @@ export class RMPhysics {
       this.helperLineGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 4))
       this.helperLineGeometry.attributes.position.needsUpdate = true
     }
-  }
-
-  showHelper() {
-    this.helperEnabled = true
-  }
-  hideHelper() {
-    this.helperEnabled = false
   }
 
   addGround(width: number, y: number) {
@@ -67,10 +62,20 @@ export class RMPhysics {
 
   addMMD(mesh: THREE.Object3D) {
     this.mesh = mesh
-    this.mesh.visible = false
-
     this.createRigidBodies()
     // this.addConstraints()
+  }
+
+  showHelper() {
+    this.helperEnabled = true
+    this.scene.add(this.helperLineSegments)
+  }
+
+  hideHelper() {
+    if (this.helperEnabled) {
+      this.scene.remove(this.helperLineSegments)
+    }
+    this.helperEnabled = false
   }
 
   private createRigidBodies() {
