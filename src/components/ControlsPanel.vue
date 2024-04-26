@@ -16,10 +16,10 @@
           <el-col :span="20" style="text-align: center"> Controls </el-col>
           <el-col :span="2" class="button">
             <el-icon
-              size="16px"
+              size="17px"
               id="drag"
-              @mouseenter="dragDisabled = false"
-              @mouseleave="dragDisabled = true"
+              @mousedown="dragDisabled = false"
+              @mouseup="dragDisabled = true"
             >
               <Rank />
             </el-icon>
