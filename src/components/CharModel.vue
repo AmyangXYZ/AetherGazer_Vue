@@ -4,8 +4,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-// import { useCharModel } from '@/hooks/useCharModelAmmo'
-import { useCharModel } from '@/hooks/useCharModelRapier'
+import { useCharModel } from '@/hooks/useCharModelAmmo'
+// import { useCharModel } from '@/hooks/useCharModelRapier'
 
 const container = ref()
 

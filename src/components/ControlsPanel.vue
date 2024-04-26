@@ -28,39 +28,39 @@
       </template>
 
       <div class="controls" v-if="showControls">
-        <el-row align="middle">
+        <el-row align="middle" justify="space-between">
           <el-col :span="14" class="label"> Char: </el-col>
-          <el-col :span="10" class="param">
+          <el-col :span="6" class="param">
             {{ SelectedChar }}
           </el-col>
         </el-row>
-        <el-row align="middle">
+        <el-row align="middle" justify="space-between">
           <el-col :span="14" class="label"> Pose: </el-col>
-          <el-col :span="10" class="param">
+          <el-col :span="6" class="param">
             {{ SelectedPose }}
           </el-col>
         </el-row>
-        <el-row align="middle">
+        <el-row align="middle" justify="space-between">
           <el-col :span="14" class="label"> Animation: </el-col>
-          <el-col :span="10" class="param">
+          <el-col :span="6" class="param">
             {{ SelectedAnimation }}
           </el-col>
         </el-row>
-        <el-row align="middle">
+        <el-row align="middle" justify="space-between">
           <el-col :span="14" class="label"> View Skin: </el-col>
-          <el-col :span="10" class="param">
+          <el-col :span="6" class="param">
             <el-switch size="small" v-model="ShowSkin" />
           </el-col>
         </el-row>
-        <el-row align="middle">
+        <el-row align="middle" justify="space-between">
           <el-col :span="14" class="label"> View skeleton </el-col>
-          <el-col :span="10" class="param">
+          <el-col :span="6" class="param">
             <el-switch size="small" v-model="ShowSkeleton" />
           </el-col>
         </el-row>
-        <el-row align="middle">
+        <el-row align="middle" justify="space-between">
           <el-col :span="14" class="label"> View rigid bodies: </el-col>
-          <el-col :span="10" class="param">
+          <el-col :span="6" class="param">
             <el-switch size="small" v-model="ShowRigidBodies" />
           </el-col>
         </el-row>
@@ -119,6 +119,6 @@ const showControls = ref(true)
   text-align: left;
 }
 .param {
-  text-align: center;
+  text-align: left;
 }
 </style>

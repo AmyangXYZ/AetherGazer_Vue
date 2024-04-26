@@ -1,5 +1,4 @@
 import { watch } from 'vue'
-
 import { SelectedPose, ShowSkin, ShowSkeleton, ShowRigidBodies, SelectedChar } from './useStates'
 import * as THREE from 'three'
 import { MMDLoader } from 'three/examples/jsm/loaders/MMDLoader'
@@ -23,7 +22,7 @@ export function useCharModel(container: HTMLElement) {
   const scene = new THREE.Scene()
 
   const physics = new RMPhysics(scene)
-  physics.addGround(80, -12)
+  physics.addGround(50, -12)
 
   const LoadChar = (char: string) => {
     if (model != undefined) {
@@ -47,14 +46,13 @@ export function useCharModel(container: HTMLElement) {
 
         // LoadPose(SelectedPose.value)
         scene.add(model!)
-
+        model!.visible = ShowSkin.value
         animationHelper.add(model, {
           // animation: m.animation,
           physics: false // disable Ammojs-based physics
         })
 
         physics.addMMD(model!)
-        model!.visible = ShowSkin.value
       })
     } else {
       model = LoadedModels[char]
@@ -71,7 +69,7 @@ export function useCharModel(container: HTMLElement) {
 
   const initScene = () => {
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
-    renderer.setPixelRatio(window.devicePixelRatio * 2)
+    renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setSize(container.clientWidth, container.clientHeight)
     container.appendChild(renderer.domElement)
     renderer.shadowMap.enabled = true
@@ -96,9 +94,9 @@ export function useCharModel(container: HTMLElement) {
     scene.add(directionalLight)
 
     stats.dom.style.position = 'fixed'
-    stats.dom.style.left = '16px'
-    stats.dom.style.bottom = '16px'
-    stats.dom.style.top = ''
+    stats.dom.style.right = '16px'
+    stats.dom.style.left = ''
+    stats.dom.style.top = '16px'
     container.appendChild(stats.dom)
   }
 
@@ -189,7 +187,7 @@ export function useCharModel(container: HTMLElement) {
   // main
   initScene()
   setEventHandlers()
-  LoadChar(SelectedChar.value)
+  // LoadChar(SelectedChar.value)
   setWatchers()
   animate()
 
