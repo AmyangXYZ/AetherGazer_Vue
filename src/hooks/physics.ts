@@ -25,7 +25,7 @@ export class RMPhysics {
       this.helperLineMaterial
     )
 
-    this.constraint_test()
+    // this.constraint_test()
   }
 
   step() {
@@ -82,18 +82,6 @@ export class RMPhysics {
 
   private createRigidBodies() {
     for (const param of this.mesh.geometry.userData.MMD.rigidBodies) {
-      const bone =
-        param.boneIndex == -1 ? new THREE.Bone() : this.mesh.skeleton.bones[param.boneIndex]
-
-      const bonePosition = new THREE.Vector3()
-      const boneQuaternion = new THREE.Quaternion()
-      const boneScale = new THREE.Vector3()
-      bone.getWorldPosition(bonePosition)
-      bone.getWorldQuaternion(boneQuaternion)
-      bone.getWorldScale(boneScale)
-      const boneMatrix = new THREE.Matrix4()
-      boneMatrix.compose(bonePosition, boneQuaternion, boneScale)
-
       const offsetPosition = new THREE.Vector3(...param.position)
       const offsetQuaternion = new THREE.Quaternion().setFromEuler(
         new THREE.Euler(...param.rotation)
@@ -102,6 +90,9 @@ export class RMPhysics {
       param.offsetMatrix = new THREE.Matrix4()
       param.offsetMatrix.compose(offsetPosition, offsetQuaternion, new THREE.Vector3(1, 1, 1))
       param.offsetMatrixInverse = param.offsetMatrix.clone().invert()
+
+      const bone =
+        param.boneIndex == -1 ? new THREE.Bone() : this.mesh.skeleton.bones[param.boneIndex]
       const { position, quaternion } = this.tranformFromBone(bone, param.offsetMatrix)
 
       let rigidBodyDesc: RAPIER.RigidBodyDesc
@@ -189,62 +180,23 @@ export class RMPhysics {
     for (const param of this.mesh.geometry.userData.MMD.constraints) {
       const bodyA = this.bodies[param.rigidBodyIndex1]
       const bodyB = this.bodies[param.rigidBodyIndex2]
-      const bodyAParam: any = bodyA.userData
-      const bodyBParam: any = bodyB.userData
-      console.log(param, bodyAParam, bodyBParam)
+
       // Extract the anchor points from the final joint transforms
-      const anchorA = this.getAnchor(param, bodyAParam.offsetMatrixInverse)
-      const anchorB = this.getAnchor(param, bodyBParam.offsetMatrixInverse)
-      console.log(anchorA, anchorB)
+      const anchorA = new THREE.Vector3()
+      const anchorB = new THREE.Vector3()
+
       const axes = [
         { x: 1, y: 0, z: 0 },
         { x: 0, y: 1, z: 0 },
         { x: 0, y: 0, z: 1 }
       ]
-      const masksLinear =
-        RAPIER.JointAxesMask.AngX | RAPIER.JointAxesMask.AngY | RAPIER.JointAxesMask.AngZ
+      const masksLinear = RAPIER.JointAxesMask.X | RAPIER.JointAxesMask.Y | RAPIER.JointAxesMask.Z
 
-      const masksAngular = RAPIER.JointAxesMask.X | RAPIER.JointAxesMask.Y | RAPIER.JointAxesMask.Z
-
-      const mask =
-        RAPIER.JointAxesMask.X |
-        RAPIER.JointAxesMask.Y |
-        RAPIER.JointAxesMask.Z |
-        RAPIER.JointAxesMask.AngX |
-        RAPIER.JointAxesMask.AngY |
-        RAPIER.JointAxesMask.AngZ
-
-      // for (let i = 0; i < 1; i++) {
-      //   if (param.translationLimitation1[i] != 0 || param.translationLimitation2[i] != 0) {
-      //     console.log(param)
-      //     const joint = RAPIER.JointData.generic(anchorA, anchorB, axes[i], masksLinear[0])
-
-      //     if (param.springPosition[i] != 0) {
-      //       joint.stiffness = param.springPosition[i]
-      //     }
-      //     joint.limitsEnabled = true
-      //     joint.limits = [-0.01, 0.01]
-      //     this.world.createImpulseJoint(joint, bodyA, bodyB, true)
-      //   }
+      // for (let i = 0; i < 3; i++) {
+      const joint = RAPIER.JointData.rope(0.5, anchorA, anchorB)
+      // joint.limits = [param.translationLimitation1[i], param.translationLimitation2[i]]
+      this.world.createImpulseJoint(joint, bodyA, bodyB, true)
       // }
-
-      // for (let i = 0; i < 1; i++) {
-      //   if (param.rotationLimitation1[i] != 0 || param.rotationLimitation2[i] != 0) {
-      //     const joint = RAPIER.JointData.generic(anchorA, anchorB, axes[i], masksAngular[0])
-      //     if (param.springRotation[i] != 0) {
-      //       joint.stiffness = param.springRotation[i]
-      //     }
-      //     joint.limitsEnabled = true
-      //     joint.limits = [param.rotationLimitation1[i], param.rotationLimitation2[i]]
-      //     this.world.createImpulseJoint(joint, bodyA, bodyB, true)
-      //   }
-      // }
-
-      // console.log(param.translationLimitation1[0], param.translationLimitation2[0])
-      const joint1 = RAPIER.JointData.rope(1, anchorA, anchorB)
-      // joint1.limits = [-0.1, 0.1]
-      this.world.createImpulseJoint(joint1, bodyA, bodyB, true)
-      // break
     }
   }
 
@@ -331,16 +283,5 @@ export class RMPhysics {
     matrix.decompose(position, quaternion, new THREE.Vector3())
 
     return { position, quaternion }
-  }
-
-  private getAnchor(joint: any, body: any): THREE.Vector3 {
-    const anchor = new THREE.Vector3(...joint.position)
-    anchor.sub(new THREE.Vector3(...body.position))
-    const inverseRotation = new THREE.Quaternion()
-      .setFromEuler(new THREE.Euler(...body.rotation))
-      .invert()
-    anchor.applyQuaternion(inverseRotation)
-    console.log(anchor)
-    return anchor
   }
 }

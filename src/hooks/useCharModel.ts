@@ -1,18 +1,18 @@
 import { watch } from 'vue'
-import { SelectedPose, ShowSkin, ShowSkeleton, ShowRigidBodies, SelectedChar } from './useStates'
+import { ShowSkin, ShowSkeleton, ShowRigidBodies } from './useStates'
 import * as THREE from 'three'
 import { MMDLoader } from 'three/examples/jsm/loaders/MMDLoader'
-import { MMDAnimationHelper } from './lib/MMDAnimationHelper'
+import { MMDAnimationHelper } from 'three/examples/jsm/animation/MMDAnimationHelper'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { OutlineEffect } from 'three/examples/jsm/effects/OutlineEffect.js'
 import Stats from 'three/addons/libs/stats.module.js'
+import { RMPhysics } from './physics'
 
 export function useCharModel(container: HTMLElement) {
   let renderer: any, camera: any
   const stats = new Stats()
   const clock = new THREE.Clock()
-  const animationHelper = new MMDAnimationHelper({ afterglow: 2.0 })
-  let ikHelper: any, physicsHelper: any, skeletonHelper: any
+  const animationHelper = new MMDAnimationHelper({ afterglow: 2 })
 
   const loader = new MMDLoader()
   const LoadedModels: { [name: string]: THREE.Object3D | undefined } = {}
@@ -20,6 +20,9 @@ export function useCharModel(container: HTMLElement) {
   let model: THREE.Object3D | undefined = undefined
   let effect: OutlineEffect
   const scene = new THREE.Scene()
+
+  const physics = new RMPhysics(scene)
+  physics.addGround(50, -12)
 
   const LoadChar = (char: string) => {
     if (model != undefined) {
@@ -46,14 +49,10 @@ export function useCharModel(container: HTMLElement) {
         model!.visible = ShowSkin.value
         animationHelper.add(model, {
           // animation: m.animation,
-          physics: true // disable Ammojs-based physics
+          physics: false // disable Ammojs-based physics
         })
 
-        if (ShowRigidBodies.value) {
-          physicsHelper = animationHelper.objects.get(model).physics.createHelper()
-          physicsHelper.visable = ShowRigidBodies.value
-          scene.add(physicsHelper)
-        }
+        physics.addMMD(model!)
       })
     } else {
       model = LoadedModels[char]
@@ -77,23 +76,16 @@ export function useCharModel(container: HTMLElement) {
 
     effect = new OutlineEffect(renderer)
 
-    const groundGeometry = new THREE.PlaneGeometry(40, 40)
-    const groundMaterial = new THREE.MeshBasicMaterial({ vertexColors: true })
-    const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial)
-    groundMesh.rotation.x = -Math.PI / 2
-    groundMesh.position.y = -12
-    scene.add(groundMesh)
-
     camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 1, 100)
     camera.position.set(0, 10, 20)
     camera.lookAt(new THREE.Vector3(0, 0, 0))
 
     // Ambient light
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1)
+    const ambientLight = new THREE.AmbientLight(16777215, 1)
     scene.add(ambientLight)
 
     // Directional light
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.4)
+    const directionalLight = new THREE.DirectionalLight(16777215, 1.4)
     directionalLight.position.set(-2, 7, 18)
     directionalLight.castShadow = true
     directionalLight.shadow.bias = -0.001
@@ -154,34 +146,30 @@ export function useCharModel(container: HTMLElement) {
       }
     })
 
+    let skeletonHelper: THREE.SkeletonHelper | undefined = undefined
     watch(ShowSkeleton, () => {
       if (model != undefined) {
         if (ShowSkeleton.value) {
           skeletonHelper = new THREE.SkeletonHelper(model)
           scene.add(skeletonHelper)
         } else {
-          scene.remove(skeletonHelper)
+          scene.remove(skeletonHelper!)
           skeletonHelper = undefined
         }
       }
     })
 
-    // ikHelper = animationHelper.objects.get(model).ikSolver.createHelper()
-    // ikHelper.visible = false
-    // scene.add(ikHelper)
-
-    watch(ShowRigidBodies, () => {
-      if (model != undefined) {
+    watch(
+      ShowRigidBodies,
+      () => {
         if (ShowRigidBodies.value) {
-          physicsHelper = animationHelper.objects.get(model).physics.createHelper()
-          physicsHelper.visable = ShowRigidBodies.value
-          scene.add(physicsHelper)
+          physics.showHelper()
         } else {
-          scene.remove(physicsHelper)
-          skeletonHelper = undefined
+          physics.hideHelper()
         }
-      }
-    })
+      },
+      { immediate: true }
+    )
   }
 
   const animate = () => {
@@ -191,20 +179,17 @@ export function useCharModel(container: HTMLElement) {
     effect.render(scene, camera)
     animationHelper.update(clock.getDelta())
 
+    physics.step()
+
     stats.end()
   }
-  const main = () => {
-    if (typeof Ammo === 'function') {
-      Ammo().then(function (AmmoLib: any) {
-        Ammo = AmmoLib
-      })
-    }
 
-    initScene()
-    setEventHandlers()
-    LoadChar(SelectedChar.value)
-    setWatchers()
-    animate()
-  }
-  main()
+  // main
+  initScene()
+  setEventHandlers()
+  // LoadChar(SelectedChar.value)
+  setWatchers()
+  animate()
+
+  return { LoadChar, LoadPose }
 }

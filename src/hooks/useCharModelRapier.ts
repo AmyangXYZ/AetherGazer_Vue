@@ -187,7 +187,7 @@ export function useCharModel(container: HTMLElement) {
   // main
   initScene()
   setEventHandlers()
-  // LoadChar(SelectedChar.value)
+  LoadChar(SelectedChar.value)
   setWatchers()
   animate()
 

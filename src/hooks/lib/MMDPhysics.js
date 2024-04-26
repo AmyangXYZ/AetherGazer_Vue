@@ -946,7 +946,7 @@ class RigidBody {
 			 * because I'm not sure why but physics will be more like MMD's
 			 * if I comment out.
 			 */
-			body.setActivationState(4);
+			// body.setActivationState(4);
 
 		}
 
@@ -1257,7 +1257,7 @@ class MMDPhysicsHelper extends Object3D {
 
 		this.materials.push(
 			new MeshBasicMaterial({
-				color: new Color(0xff8888),
+				color: new Color(0xffffff),
 				wireframe: true,
 				depthTest: false,
 				depthWrite: false,
@@ -1268,7 +1268,7 @@ class MMDPhysicsHelper extends Object3D {
 
 		this.materials.push(
 			new MeshBasicMaterial({
-				color: new Color(0x88ff88),
+				color: new Color(0xffffff),
 				wireframe: true,
 				depthTest: false,
 				depthWrite: false,
@@ -1279,7 +1279,7 @@ class MMDPhysicsHelper extends Object3D {
 
 		this.materials.push(
 			new MeshBasicMaterial({
-				color: new Color(0x8888ff),
+				color: new Color(0xffffff),
 				wireframe: true,
 				depthTest: false,
 				depthWrite: false,
