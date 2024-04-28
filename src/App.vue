@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import ControlsPanel from './components/ControlsPanel.vue'
-import CharModel from './components/CharModel.vue'
+import MainScene from './components/MainScene.vue'
 </script>
 
 <template>
   <main>
     <ControlsPanel />
-    <CharModel />
+    <MainScene />
   </main>
 </template>
 

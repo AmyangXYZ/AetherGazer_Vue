@@ -1,20 +1,20 @@
 <template>
-  <div class="char" ref="container"></div>
+  <canvas class="scene" ref="canvas"></canvas>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useCharModel } from '@/hooks/useCharModel'
+import { useScene } from '@/hooks/useScene'
 
-const container = ref()
+const canvas = ref()
 
-onMounted(() => {
-  useCharModel(container.value)
+onMounted(async () => {
+  await useScene(canvas.value)
 })
 </script>
 
 <style scoped>
-.char {
+.scene {
   position: absolute;
   width: 100%;
   height: 100vh;
