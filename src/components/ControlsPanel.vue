@@ -29,39 +29,38 @@
 
       <div class="controls" v-if="showControls">
         <el-row align="middle" justify="space-between">
-          <el-col :span="14" class="label"> Char: </el-col>
-          <el-col :span="6" class="param">
-            {{ SelectedChar }}
+          <el-col :span="12" class="label"> Char: </el-col>
+          <el-col :span="12" class="param">
+            <el-select v-model="SelectedChar" style="width: 80px">
+              <el-option
+                v-for="item in ['Thoth', 'Thoth2', 'Hades', 'Gengchen', 'Yingzhao']"
+                :key="item"
+                :label="item"
+                :value="item"
+              />
+            </el-select>
           </el-col>
         </el-row>
+
         <el-row align="middle" justify="space-between">
-          <el-col :span="14" class="label"> Pose: </el-col>
-          <el-col :span="6" class="param">
-            {{ SelectedPose }}
+          <el-col :span="12" class="label"> Animation: </el-col>
+          <el-col :span="12" class="param">
+            <el-select v-model="SelectedAnimation" style="width: 80px">
+              <el-option v-for="item in [1, 2, 3]" :key="item" :label="item" :value="item" />
+            </el-select>
           </el-col>
         </el-row>
+
         <el-row align="middle" justify="space-between">
-          <el-col :span="14" class="label"> Animation: </el-col>
-          <el-col :span="6" class="param">
-            {{ SelectedAnimation }}
-          </el-col>
-        </el-row>
-        <el-row align="middle" justify="space-between">
-          <el-col :span="14" class="label"> View Skin: </el-col>
-          <el-col :span="6" class="param">
-            <el-switch size="small" v-model="ShowSkin" />
-          </el-col>
-        </el-row>
-        <el-row align="middle" justify="space-between">
-          <el-col :span="14" class="label"> View skeleton </el-col>
-          <el-col :span="6" class="param">
-            <el-switch size="small" v-model="ShowSkeleton" />
-          </el-col>
-        </el-row>
-        <el-row align="middle" justify="space-between">
-          <el-col :span="14" class="label"> View rigid bodies: </el-col>
-          <el-col :span="6" class="param">
+          <el-col :span="12" class="label"> Rigid body: </el-col>
+          <el-col :span="12" class="param">
             <el-switch size="small" v-model="ShowRigidBodies" />
+          </el-col>
+        </el-row>
+        <el-row align="middle" justify="space-between">
+          <el-col :span="12" class="label"> Show FPS: </el-col>
+          <el-col :span="12" class="param">
+            <el-switch size="small" v-model="ShowFPS" />
           </el-col>
         </el-row>
       </div>
@@ -70,14 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  SelectedChar,
-  SelectedPose,
-  SelectedAnimation,
-  ShowSkeleton,
-  ShowRigidBodies,
-  ShowSkin
-} from '@/hooks/useStates'
+import { SelectedChar, SelectedAnimation, ShowRigidBodies, ShowFPS } from '@/hooks/useStates'
 import { ArrowRightBold, Rank } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { useDraggable } from '@vueuse/core'
@@ -119,6 +111,6 @@ const showControls = ref(true)
   text-align: left;
 }
 .param {
-  text-align: left;
+  text-align: center;
 }
 </style>
