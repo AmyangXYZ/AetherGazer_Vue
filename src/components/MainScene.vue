@@ -25,7 +25,7 @@ onMounted(async () => {
   top: 16px;
 }
 .scene {
-  position: absolute;
+  /* position: fixed; */
   width: 100%;
   height: 100vh;
   z-index: 1;

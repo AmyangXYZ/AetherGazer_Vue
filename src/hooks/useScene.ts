@@ -18,7 +18,14 @@ import {
 } from '@babylonjs/core'
 import { HavokPlugin } from '@babylonjs/core/Physics/v2/Plugins/havokPlugin'
 import havokPhysics from '@babylonjs/havok'
-import { VmdLoader, MmdRuntime, MmdPhysics, MmdAnimation, MmdModel } from 'babylon-mmd'
+import {
+  VmdLoader,
+  MmdRuntime,
+  MmdPhysics,
+  MmdAnimation,
+  MmdModel,
+  MmdPlayerControl
+} from 'babylon-mmd'
 
 import { watch } from 'vue'
 import { FPS, SelectedAnimation, SelectedChar, ShowRigidBodies } from './useStates'
@@ -117,7 +124,8 @@ export async function useScene(canvas: HTMLCanvasElement) {
 
   await loadMesh()
   loadMotion()
-
+  const control = new MmdPlayerControl(scene, mmdRuntime, undefined)
+  control.autoHidePlayerControl = true
   watch(SelectedChar, async () => {
     if (mmdModel != undefined) {
       mmdRuntime.destroyMmdModel(mmdModel)
