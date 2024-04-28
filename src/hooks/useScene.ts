@@ -125,7 +125,7 @@ export async function useScene(canvas: HTMLCanvasElement) {
   await loadMesh()
   loadMotion()
   const control = new MmdPlayerControl(scene, mmdRuntime, undefined)
-  control.autoHidePlayerControl = true
+  control.showPlayerControl()
   watch(SelectedChar, async () => {
     if (mmdModel != undefined) {
       mmdRuntime.destroyMmdModel(mmdModel)
