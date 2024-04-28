@@ -1,5 +1,5 @@
 import { watch } from 'vue'
-import { ShowSkin, ShowSkeleton, ShowRigidBodies } from './useStates'
+import { SelectedPose, ShowSkin, ShowSkeleton, ShowRigidBodies, SelectedChar } from './useStates'
 import * as THREE from 'three'
 import { MMDLoader } from 'three/examples/jsm/loaders/MMDLoader'
 import { MMDAnimationHelper } from 'three/examples/jsm/animation/MMDAnimationHelper'
@@ -12,7 +12,7 @@ export function useCharModel(container: HTMLElement) {
   let renderer: any, camera: any
   const stats = new Stats()
   const clock = new THREE.Clock()
-  const animationHelper = new MMDAnimationHelper({ afterglow: 2 })
+  const animationHelper = new MMDAnimationHelper({ afterglow: 2.0 })
 
   const loader = new MMDLoader()
   const LoadedModels: { [name: string]: THREE.Object3D | undefined } = {}
@@ -69,24 +69,24 @@ export function useCharModel(container: HTMLElement) {
 
   const initScene = () => {
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
-    renderer.setPixelRatio(window.devicePixelRatio)
+    renderer.setPixelRatio(2)
     renderer.setSize(container.clientWidth, container.clientHeight)
     container.appendChild(renderer.domElement)
     renderer.shadowMap.enabled = true
 
     effect = new OutlineEffect(renderer)
 
-    camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 1, 100)
+    camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 1, 100)
     camera.position.set(0, 10, 20)
     camera.lookAt(new THREE.Vector3(0, 0, 0))
 
     // Ambient light
-    const ambientLight = new THREE.AmbientLight(16777215, 1)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1)
     scene.add(ambientLight)
 
     // Directional light
-    const directionalLight = new THREE.DirectionalLight(16777215, 1.4)
-    directionalLight.position.set(-2, 7, 18)
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.4)
+    directionalLight.position.set(-2, 7, 18).normalize()
     directionalLight.castShadow = true
     directionalLight.shadow.bias = -0.001
     directionalLight.shadow.mapSize.width = 2048
@@ -187,9 +187,7 @@ export function useCharModel(container: HTMLElement) {
   // main
   initScene()
   setEventHandlers()
-  // LoadChar(SelectedChar.value)
+  LoadChar(SelectedChar.value)
   setWatchers()
   animate()
-
-  return { LoadChar, LoadPose }
 }
