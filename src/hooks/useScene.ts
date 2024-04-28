@@ -13,11 +13,12 @@ import {
   ShadowGenerator,
   PhysicsShapeType,
   PhysicsAggregate,
-  PhysicsViewer
+  PhysicsViewer,
+  AbstractMesh
 } from '@babylonjs/core'
 import { HavokPlugin } from '@babylonjs/core/Physics/v2/Plugins/havokPlugin'
 import havokPhysics from '@babylonjs/havok'
-import { VmdLoader, MmdRuntime, MmdPhysics } from 'babylon-mmd'
+import { VmdLoader, MmdRuntime, MmdPhysics, MmdAnimation, MmdModel } from 'babylon-mmd'
 
 import { watch } from 'vue'
 import { FPS, SelectedAnimation, SelectedChar, ShowRigidBodies } from './useStates'
@@ -30,14 +31,15 @@ export async function useScene(canvas: HTMLCanvasElement) {
   const havokPlugin = new HavokPlugin(true, havokInstance)
   scene.enablePhysics(new Vector3(0, -98, 0), havokPlugin)
 
-  let physicsViewer: any
+  let physicsViewer: PhysicsViewer | undefined
 
   const showPhysicsHelper = () => {
     if (physicsViewer != undefined) {
       physicsViewer.dispose()
     }
     physicsViewer = new PhysicsViewer(scene)
-    for (const body of mmdModel._physicsModel._bodies) {
+    const m = mmdModel as any // bypass access-private check
+    for (const body of m._physicsModel._bodies) {
       if (body != undefined) {
         physicsViewer.showBody(body)
       }
@@ -81,7 +83,7 @@ export async function useScene(canvas: HTMLCanvasElement) {
   mmdRuntime.register(scene)
 
   const vmdLoader = new VmdLoader(scene)
-  let modelMesh: any, mmdModel: any, motion: any
+  let modelMesh: AbstractMesh, mmdModel: MmdModel, motion: MmdAnimation
 
   const loadMesh = async () => {
     modelMesh = await SceneLoader.ImportMeshAsync(
@@ -126,7 +128,8 @@ export async function useScene(canvas: HTMLCanvasElement) {
         physicsViewer = undefined
       }
     }
-    loadMesh()
+    await loadMesh()
+    loadMotion()
   })
 
   watch(SelectedAnimation, async () => {
@@ -151,8 +154,10 @@ export async function useScene(canvas: HTMLCanvasElement) {
     if (ShowRigidBodies.value) {
       showPhysicsHelper()
     } else {
-      physicsViewer.dispose()
-      physicsViewer = undefined
+      if (physicsViewer != undefined) {
+        physicsViewer.dispose()
+        physicsViewer = undefined
+      }
     }
   })
 

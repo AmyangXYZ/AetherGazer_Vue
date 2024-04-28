@@ -32,12 +32,7 @@
           <el-col :span="12" class="label"> Char: </el-col>
           <el-col :span="12" class="param">
             <el-select v-model="SelectedChar" style="width: 80px">
-              <el-option
-                v-for="item in ['Thoth', 'Thoth2', 'Hades', 'Gengchen', 'Yingzhao']"
-                :key="item"
-                :label="item"
-                :value="item"
-              />
+              <el-option v-for="item in Chars" :key="item" :label="item" :value="item" />
             </el-select>
           </el-col>
         </el-row>
@@ -46,7 +41,7 @@
           <el-col :span="12" class="label"> Animation: </el-col>
           <el-col :span="12" class="param">
             <el-select v-model="SelectedAnimation" style="width: 80px">
-              <el-option v-for="item in [1, 2, 3]" :key="item" :label="item" :value="item" />
+              <el-option v-for="item in Motions" :key="item" :label="item" :value="item" />
             </el-select>
           </el-col>
         </el-row>
@@ -69,7 +64,14 @@
 </template>
 
 <script setup lang="ts">
-import { SelectedChar, SelectedAnimation, ShowRigidBodies, ShowFPS } from '@/hooks/useStates'
+import {
+  Chars,
+  Motions,
+  SelectedChar,
+  SelectedAnimation,
+  ShowRigidBodies,
+  ShowFPS
+} from '@/hooks/useStates'
 import { ArrowRightBold, Rank } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { useDraggable } from '@vueuse/core'
