@@ -18,9 +18,8 @@
             <el-icon
               size="17px"
               id="drag"
-              @mousedown="dragDisabled = false"
-              @mouseon="dragDisabled = false"
-              @mouseup="dragDisabled = true"
+              @mouseover="dragDisabled = false"
+              @mouseleave="dragDisabled = true"
             >
               <Rank />
             </el-icon>
@@ -47,7 +46,7 @@
           </el-col>
         </el-row>
         <el-row align="middle" justify="space-between">
-          <el-col :span="12" class="label"> Enable physics: </el-col>
+          <el-col :span="12" class="label"> Physics: </el-col>
           <el-col :span="12" class="param">
             <el-switch size="small" v-model="PhysicsEnabled" />
           </el-col>
