@@ -19,6 +19,7 @@
               size="17px"
               id="drag"
               @mousedown="dragDisabled = false"
+              @mouseon="dragDisabled = false"
               @mouseup="dragDisabled = true"
             >
               <Rank />

@@ -1,9 +1,11 @@
 <template>
-  <canvas class="scene" ref="canvas"></canvas>
-  <h4 v-if="ShowFPS" id="fps">FPS: {{ FPS }}</h4>
-  <a href="https://github.com/AmyangXYZ/AetherGazer_Vue" target="“_blank”">
-    <IconGithub id="git" />
-  </a>
+  <div style="height: 100vh">
+    <canvas class="scene" ref="canvas"></canvas>
+    <h4 v-if="ShowFPS" id="fps">FPS: {{ FPS }}</h4>
+    <a href="https://github.com/AmyangXYZ/AetherGazer_Vue" target="“_blank”">
+      <IconGithub id="git" />
+    </a>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -25,7 +27,7 @@ onMounted(async () => {
 .scene {
   /* position: fixed; */
   width: 100%;
-  height: 100vh;
+  height: 100%;
   z-index: 1;
 }
 #fps {

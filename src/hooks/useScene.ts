@@ -4,7 +4,6 @@ import {
   Scene,
   SceneLoader,
   Vector3,
-  StandardMaterial,
   Mesh,
   MeshBuilder,
   Color3,
@@ -14,7 +13,9 @@ import {
   PhysicsShapeType,
   PhysicsAggregate,
   PhysicsViewer,
-  AbstractMesh
+  AbstractMesh,
+  Texture,
+  BackgroundMaterial
 } from '@babylonjs/core'
 import { HavokPlugin } from '@babylonjs/core/Physics/v2/Plugins/havokPlugin'
 import havokPhysics from '@babylonjs/havok'
@@ -64,7 +65,7 @@ export async function useScene(canvas: HTMLCanvasElement) {
   hemisphericLight.specular = new Color3(0, 0, 0)
   hemisphericLight.groundColor = new Color3(1, 1, 1)
 
-  const directionalLight = new DirectionalLight('DirectionalLight', new Vector3(0.5, -1, 1), scene)
+  const directionalLight = new DirectionalLight('DirectionalLight', new Vector3(8, -15, 10), scene)
   directionalLight.intensity = 0.8
 
   const shadowGenerator = new ShadowGenerator(1024, directionalLight, true)
@@ -73,14 +74,24 @@ export async function useScene(canvas: HTMLCanvasElement) {
   shadowGenerator.filteringQuality = ShadowGenerator.QUALITY_MEDIUM
   shadowGenerator.frustumEdgeFalloff = 0.1
 
-  const groundMaterial = new StandardMaterial('GroundMaterial', scene)
-  groundMaterial.diffuseColor = new Color3(0.1, 0.1, 0.1)
-  const ground = MeshBuilder.CreateGround(
-    'Ground',
-    { width: 50, height: 50, subdivisions: 2, updatable: false },
+  // Create and tweak the background material.
+  const backgroundMaterial = new BackgroundMaterial('backgroundMaterial', scene)
+  backgroundMaterial.diffuseTexture = new Texture(
+    'https://assets.babylonjs.com/environments/backgroundGround.png',
     scene
   )
-  ground.material = groundMaterial
+  backgroundMaterial.diffuseTexture.hasAlpha = true
+  backgroundMaterial.opacityFresnel = false
+  backgroundMaterial.shadowLevel = 0.4
+  backgroundMaterial.useRGBColor = false
+  backgroundMaterial.primaryColor = Color3.Magenta()
+  const ground = MeshBuilder.CreateGround('Ground', {
+    width: 50,
+    height: 50,
+    subdivisions: 2,
+    updatable: false
+  })
+  ground.material = backgroundMaterial
   ground.receiveShadows = true
   new PhysicsAggregate(ground, PhysicsShapeType.BOX, { mass: 0 }, scene)
 
