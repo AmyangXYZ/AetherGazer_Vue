@@ -1,10 +1,14 @@
 <template>
   <canvas class="scene" ref="canvas"></canvas>
   <h4 v-if="ShowFPS" id="fps">FPS: {{ FPS }}</h4>
+  <a href="https://github.com/AmyangXYZ/AetherGazer_Vue" target="“_blank”">
+    <IconGithub id="git" />
+  </a>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import IconGithub from './icons/IconGithub.vue'
 import { ShowFPS, FPS } from '@/hooks/useStates'
 import { useScene } from '@/hooks/useScene'
 
@@ -18,16 +22,23 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-#fps {
-  position: absolute;
-  z-index: 2;
-  right: 16px;
-  top: 16px;
-}
 .scene {
   /* position: fixed; */
   width: 100%;
   height: 100vh;
   z-index: 1;
+}
+#fps {
+  position: absolute;
+  z-index: 2;
+  right: 24px;
+  top: 16px;
+}
+#git {
+  position: absolute;
+  z-index: 2;
+  left: 24px;
+  top: 16px;
+  color: white;
 }
 </style>
