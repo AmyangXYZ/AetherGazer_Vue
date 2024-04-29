@@ -46,11 +46,16 @@
             </el-select>
           </el-col>
         </el-row>
-
+        <el-row align="middle" justify="space-between">
+          <el-col :span="12" class="label"> Enable physics: </el-col>
+          <el-col :span="12" class="param">
+            <el-switch size="small" v-model="PhysicsEnabled" />
+          </el-col>
+        </el-row>
         <el-row align="middle" justify="space-between">
           <el-col :span="12" class="label"> Rigid body: </el-col>
           <el-col :span="12" class="param">
-            <el-switch size="small" v-model="ShowRigidBodies" />
+            <el-switch :disabled="!PhysicsEnabled" size="small" v-model="ShowRigidBodies" />
           </el-col>
         </el-row>
         <el-row align="middle" justify="space-between">
@@ -71,7 +76,8 @@ import {
   SelectedChar,
   SelectedAnimation,
   ShowRigidBodies,
-  ShowFPS
+  ShowFPS,
+  PhysicsEnabled
 } from '@/hooks/useStates'
 import { ArrowRightBold, Rank } from '@element-plus/icons-vue'
 import { ref } from 'vue'
