@@ -78,18 +78,15 @@ export async function useScene(canvas: HTMLCanvasElement) {
 
     // Create and tweak the background material.
     const backgroundMaterial = new BackgroundMaterial('backgroundMaterial', scene)
-    backgroundMaterial.diffuseTexture = new Texture(
-      'https://assets.babylonjs.com/environments/backgroundGround.png',
-      scene
-    )
+    backgroundMaterial.diffuseTexture = new Texture('/backgroundGround.png', scene)
     backgroundMaterial.diffuseTexture.hasAlpha = true
     backgroundMaterial.opacityFresnel = false
     backgroundMaterial.shadowLevel = 0.4
     backgroundMaterial.useRGBColor = false
     backgroundMaterial.primaryColor = Color3.Magenta()
     const ground = MeshBuilder.CreateGround('Ground', {
-      width: 50,
-      height: 50,
+      width: 64,
+      height: 64,
       subdivisions: 2,
       updatable: false
     })
