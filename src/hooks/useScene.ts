@@ -103,7 +103,12 @@ export async function useScene(canvas: HTMLCanvasElement) {
     control: MmdPlayerControl
 
   const initMMD = async () => {
-    mmdRuntime = new MmdRuntime(scene, PhysicsEnabled.value ? new MmdPhysics(scene) : undefined)
+    let physics: MmdPhysics | undefined = undefined
+    if (PhysicsEnabled.value) {
+      physics = new MmdPhysics(scene)
+      physics.angularLimitClampThreshold = (30 * Math.PI) / 180
+    }
+    mmdRuntime = new MmdRuntime(scene, physics)
 
     mmdRuntime.register(scene)
 
@@ -111,6 +116,12 @@ export async function useScene(canvas: HTMLCanvasElement) {
     loadMotion()
     control = new MmdPlayerControl(scene, mmdRuntime, undefined)
     control.showPlayerControl()
+    mmdRuntime.onPauseAnimationObservable.add(() => {
+      if (mmdRuntime.currentTime == mmdRuntime.animationDuration) {
+        mmdRuntime.seekAnimation(0, true)
+        mmdRuntime.playAnimation()
+      }
+    })
   }
 
   const loadMesh = async () => {
@@ -170,6 +181,7 @@ export async function useScene(canvas: HTMLCanvasElement) {
         loadMotion()
       } else {
         mmdModel.setAnimation(`${SelectedAnimation.value}`)
+        mmdRuntime.seekAnimation(0, true)
         mmdRuntime.playAnimation()
       }
     }

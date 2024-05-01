@@ -1,5 +1,0 @@
-胸部使用了RGBA式物理
-
-进入PmxEditor，在Joint栏找到左胸和右胸，修改移动/旋转参数。
-
-更多调整方法请阅读：https://rgba.blog.jp/archives/10475373.html
