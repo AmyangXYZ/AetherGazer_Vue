@@ -1,6 +1,17 @@
 import { ref } from 'vue'
 
-export const Chars = ['Thoth', 'Thoth2', 'Bastet', 'Hera', 'Gengchen', 'Yingzhao']
+export const Chars = [
+  'Thoth',
+  'Thoth2',
+  'Bastet',
+  'Hades',
+  'Gengchen',
+  'Yingzhao',
+  'Lingguang',
+  'Sekhmet',
+  'Jin-ei',
+  'Hera'
+]
 export const Motions = ['Miku', 'Zyy', 'Stand', 'iKun1', 'iKun2']
 
 export const FPS = ref(0)
