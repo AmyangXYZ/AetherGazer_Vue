@@ -15,7 +15,8 @@ import {
   PhysicsViewer,
   AbstractMesh,
   Texture,
-  BackgroundMaterial
+  BackgroundMaterial,
+  SkeletonViewer
 } from '@babylonjs/core'
 import { HavokPlugin } from '@babylonjs/core/Physics/v2/Plugins/havokPlugin'
 import havokPhysics from '@babylonjs/havok'
@@ -115,7 +116,7 @@ export async function useScene(canvas: HTMLCanvasElement) {
     await loadMesh()
     loadMotion()
     control = new MmdPlayerControl(scene, mmdRuntime, undefined)
-    control.showPlayerControl()
+    control.autoHidePlayerControl = true
     mmdRuntime.onPauseAnimationObservable.add(() => {
       if (mmdRuntime.currentTime == mmdRuntime.animationDuration) {
         mmdRuntime.seekAnimation(0, true)
@@ -135,6 +136,9 @@ export async function useScene(canvas: HTMLCanvasElement) {
       for (const m of mesh.metadata.meshes) {
         m.receiveShadows = true
       }
+      const skeletonViewer = new SkeletonViewer(result.skeletons[0], modelMesh, scene, false)
+      skeletonViewer.isEnabled = true
+      skeletonViewer.color = new Color3(1, 0, 0)
       shadowGenerator.addShadowCaster(mesh)
       return mesh
     })

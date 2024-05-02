@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import OpenAI from './components/OpenAI.vue'
 import ControlsPanel from './components/ControlsPanel.vue'
 import MainScene from './components/MainScene.vue'
 </script>
@@ -7,6 +8,7 @@ import MainScene from './components/MainScene.vue'
   <main>
     <ControlsPanel />
     <MainScene />
+    <OpenAI />
   </main>
 </template>
 

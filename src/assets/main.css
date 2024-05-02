@@ -14,3 +14,8 @@
 .el-card__header {
   background-color: rgb(41, 45, 57);
 }
+
+.el-input,
+.el-input__wrapper {
+  border-radius: 16px;
+}

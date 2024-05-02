@@ -63,6 +63,12 @@
             <el-switch size="small" v-model="ShowFPS" />
           </el-col>
         </el-row>
+        <el-row align="middle" justify="space-between">
+          <el-col :span="12" class="label"> OpenAI api key: </el-col>
+          <el-col :span="12" class="param">
+            <el-input size="small" v-model="OpenAI_API_KEY" />
+          </el-col>
+        </el-row>
       </div>
     </el-card>
   </div>
@@ -76,7 +82,8 @@ import {
   SelectedAnimation,
   ShowRigidBodies,
   ShowFPS,
-  PhysicsEnabled
+  PhysicsEnabled,
+  OpenAI_API_KEY
 } from '@/hooks/useStates'
 import { ArrowRightBold, Rank } from '@element-plus/icons-vue'
 import { ref } from 'vue'
