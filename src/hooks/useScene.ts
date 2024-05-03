@@ -16,7 +16,11 @@ import {
   AbstractMesh,
   Texture,
   BackgroundMaterial,
-  SkeletonViewer
+  SkeletonViewer,
+  PointerDragBehavior,
+  Space,
+  ActionManager,
+  ExecuteCodeAction
 } from '@babylonjs/core'
 import { HavokPlugin } from '@babylonjs/core/Physics/v2/Plugins/havokPlugin'
 import havokPhysics from '@babylonjs/havok'
@@ -96,6 +100,23 @@ export async function useScene(canvas: HTMLCanvasElement) {
     new PhysicsAggregate(ground, PhysicsShapeType.BOX, { mass: 0 }, scene)
   }
 
+  const pointerDragBehavior = new PointerDragBehavior({
+    dragAxis: new Vector3(0.01, 0, 0) // Rotate around the X-axis
+  })
+  pointerDragBehavior.onDragStartObservable.add(() => {
+    if (scene.activeCamera) {
+      scene.activeCamera.detachControl(canvas)
+    }
+  })
+  pointerDragBehavior.onDragObservable.add((event) => {
+    modelMesh.rotation.y -= event.dragDistance * 1.25
+  })
+  pointerDragBehavior.onDragEndObservable.add(() => {
+    if (scene.activeCamera) {
+      scene.activeCamera.attachControl(canvas, true)
+    }
+  })
+
   const vmdLoader = new VmdLoader(scene)
   let mmdRuntime: MmdRuntime,
     modelMesh: AbstractMesh,
@@ -142,10 +163,12 @@ export async function useScene(canvas: HTMLCanvasElement) {
       shadowGenerator.addShadowCaster(mesh)
       return mesh
     })
-    mmdModel = mmdRuntime.createMmdModel(modelMesh as Mesh)
+
     if (ShowRigidBodies.value) {
       showPhysicsHelper()
     }
+    modelMesh.addBehavior(pointerDragBehavior)
+    mmdModel = mmdRuntime.createMmdModel(modelMesh as Mesh)
   }
 
   const loadMotion = async () => {
