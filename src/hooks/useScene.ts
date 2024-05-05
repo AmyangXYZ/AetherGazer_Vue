@@ -83,6 +83,7 @@ export async function useScene(canvas: HTMLCanvasElement) {
     shadowGenerator.forceBackFacesOnly = true
     shadowGenerator.filteringQuality = ShadowGenerator.QUALITY_MEDIUM
     shadowGenerator.frustumEdgeFalloff = 0.1
+    shadowGenerator.transparencyShadow = true
 
     // Create and tweak the background material.
     const backgroundMaterial = new BackgroundMaterial('backgroundMaterial', scene)
