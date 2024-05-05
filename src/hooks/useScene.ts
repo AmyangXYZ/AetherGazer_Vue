@@ -17,10 +17,7 @@ import {
   Texture,
   BackgroundMaterial,
   SkeletonViewer,
-  PointerDragBehavior,
-  Space,
-  ActionManager,
-  ExecuteCodeAction
+  PointerDragBehavior
 } from '@babylonjs/core'
 import { HavokPlugin } from '@babylonjs/core/Physics/v2/Plugins/havokPlugin'
 import havokPhysics from '@babylonjs/havok'
@@ -30,14 +27,20 @@ import {
   MmdPhysics,
   MmdAnimation,
   MmdModel,
-  MmdPlayerControl
+  MmdPlayerControl,
+  PmxLoader
 } from 'babylon-mmd'
 
 import { watch } from 'vue'
 import { FPS, PhysicsEnabled, SelectedAnimation, SelectedChar, ShowRigidBodies } from './useStates'
+import { SdefInjector } from 'babylon-mmd/esm/Loader/sdefInjector'
 
 export async function useScene(canvas: HTMLCanvasElement) {
   const engine = new Engine(canvas, true, {}, true)
+  SdefInjector.OverrideEngineCreateEffect(engine)
+  const pmxLoader = SceneLoader.GetPluginForExtension('.pmx') as PmxLoader
+  pmxLoader.loggingEnabled = true
+
   const scene = new Scene(engine)
   let shadowGenerator: ShadowGenerator
 
