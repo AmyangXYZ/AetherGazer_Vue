@@ -2,15 +2,25 @@
   <div style="height: 100vh">
     <canvas class="scene" ref="canvas"></canvas>
     <h4 v-if="ShowFPS" id="fps">FPS: {{ FPS }}</h4>
-    <a href="https://github.com/AmyangXYZ/AetherGazer_Vue" target="“_blank”">
-      <IconGithub id="git" />
-    </a>
+    <el-row class="icons" align="middle">
+      <el-col :span="12">
+        <a href="https://github.com/AmyangXYZ/AetherGazer_Vue" target="“_blank”">
+          <IconGithub id="git" />
+        </a>
+      </el-col>
+      <el-col :span="12">
+        <a href="https://github.com/AmyangXYZ/AniMate" target="“_blank”">
+          <IconDownload id="download" />
+        </a>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import IconGithub from './icons/IconGithub.vue'
+import IconDownload from './icons/IconDownload.vue'
 import { ShowFPS, FPS } from '@/hooks/useStates'
 import { useScene } from '@/hooks/useScene'
 
@@ -36,11 +46,12 @@ onMounted(async () => {
   right: 24px;
   top: 16px;
 }
-#git {
+.icons {
   position: absolute;
   z-index: 2;
   left: 24px;
   top: 16px;
   color: white;
+  width: 75px;
 }
 </style>

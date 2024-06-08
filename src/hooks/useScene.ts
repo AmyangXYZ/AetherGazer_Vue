@@ -10,14 +10,11 @@ import {
   HemisphericLight,
   DirectionalLight,
   ShadowGenerator,
-  PhysicsShapeType,
-  PhysicsAggregate,
   PhysicsViewer,
   AbstractMesh,
   Texture,
   BackgroundMaterial,
-  SkeletonViewer,
-  PointerDragBehavior
+  SkeletonViewer
 } from '@babylonjs/core'
 import { HavokPlugin } from '@babylonjs/core/Physics/v2/Plugins/havokPlugin'
 import havokPhysics from '@babylonjs/havok'
@@ -27,20 +24,14 @@ import {
   MmdPhysics,
   MmdAnimation,
   MmdModel,
-  MmdPlayerControl,
-  PmxLoader
+  MmdPlayerControl
 } from 'babylon-mmd'
 
 import { watch } from 'vue'
 import { FPS, PhysicsEnabled, SelectedAnimation, SelectedChar, ShowRigidBodies } from './useStates'
-import { SdefInjector } from 'babylon-mmd/esm/Loader/sdefInjector'
 
 export async function useScene(canvas: HTMLCanvasElement) {
   const engine = new Engine(canvas, true, {}, true)
-  SdefInjector.OverrideEngineCreateEffect(engine)
-  const pmxLoader = SceneLoader.GetPluginForExtension('.pmx') as PmxLoader
-  pmxLoader.loggingEnabled = true
-
   const scene = new Scene(engine)
   let shadowGenerator: ShadowGenerator
 
@@ -101,25 +92,7 @@ export async function useScene(canvas: HTMLCanvasElement) {
     })
     ground.material = backgroundMaterial
     ground.receiveShadows = true
-    new PhysicsAggregate(ground, PhysicsShapeType.BOX, { mass: 0 }, scene)
   }
-
-  const pointerDragBehavior = new PointerDragBehavior({
-    dragAxis: new Vector3(0.01, 0, 0) // Rotate around the X-axis
-  })
-  pointerDragBehavior.onDragStartObservable.add(() => {
-    if (scene.activeCamera) {
-      scene.activeCamera.detachControl(canvas)
-    }
-  })
-  pointerDragBehavior.onDragObservable.add((event) => {
-    modelMesh.rotation.y -= event.dragDistance * 1.25
-  })
-  pointerDragBehavior.onDragEndObservable.add(() => {
-    if (scene.activeCamera) {
-      scene.activeCamera.attachControl(canvas, true)
-    }
-  })
 
   const vmdLoader = new VmdLoader(scene)
   let mmdRuntime: MmdRuntime,
@@ -171,7 +144,6 @@ export async function useScene(canvas: HTMLCanvasElement) {
     if (ShowRigidBodies.value) {
       showPhysicsHelper()
     }
-    modelMesh.addBehavior(pointerDragBehavior)
     mmdModel = mmdRuntime.createMmdModel(modelMesh as Mesh)
   }
 

@@ -7,6 +7,7 @@ export const Chars = [
   'Hades',
   'Gengchen',
   'Yingzhao',
+  'Yingzhao2',
   'Lingguang',
   'Sekhmet',
   'Jin-ei',
